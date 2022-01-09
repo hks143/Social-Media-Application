@@ -5,6 +5,8 @@ A simple social media application with users, posts, likes,comments and messages
 # Features 
 - It's a full stack MERN application where user can signup and then sign in with corresponding details.
 - Users can also sign in with Google account.
+- SignIn via OTP.
+- Forget Password feature is available.
 - Users can create a post and then edit or delete their post.
 - Users can like and comment.
 - Real-time chat is supported.
