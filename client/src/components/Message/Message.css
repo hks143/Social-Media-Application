@@ -1,0 +1,50 @@
+.messageBox{
+    padding: 0.7vmax;
+    margin: 1vmax;
+    border-radius: 0.5vmax;
+    display: inline-block;
+    clear: both;
+    font-size: 1.5vmax;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-bottom: 5px;
+}
+
+.right{
+    float: right;
+    background-color: #90c317;
+    color: white;
+    text-align: right;
+}
+
+.left{
+    float: left;
+    text-align: left;
+    background-color: #15ca4b;
+    color: white;
+    
+}
+
+
+.message {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+  }
+  
+  .messageTop{
+      display: flex;
+  }
+  
+ 
+  .messageText{
+      padding: 10px;
+      border-radius: 20px;
+      background-color: #1877f2;
+      color: black;
+      max-width: 300px;
+  }
+  
+  .messageBottom{
+    font-size: 0.8vmax;
+      margin-top: 5px;
+  }
