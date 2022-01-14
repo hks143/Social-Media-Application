@@ -11,7 +11,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import ReplyIcon from '@mui/icons-material/Reply';
 import SendIcon from '@mui/icons-material/Send';
 import { io } from 'socket.io-client'
-import {AddNotification,FindNotification,ClearNotification, SendMailToUser, FindUserForChat, GetDirectMessage, createMessage } from '../../actions/direct';
+import { AddNotification, FindNotification, ClearNotification, SendMailToUser, FindUserForChat, GetDirectMessage, createMessage } from '../../actions/direct';
+import Navbar from '../Navbar/Navbar';
 const initial = { sender: '', receiver: '', createdAt: Date.now(), text: '' }
 const Chat = () => {
     const { p } = useSelector((state) => state);
@@ -35,8 +36,8 @@ const Chat = () => {
     // console.log(p);
     useEffect(async () => {
         // console.log(conversationId);
-        const data = await dispatch(GetDirectMessage({ conversationId: conversationId,senderId:(user?.result?.googleId || user?.result?._id) }));
-    
+        const data = await dispatch(GetDirectMessage({ conversationId: conversationId, senderId: (user?.result?.googleId || user?.result?._id) }));
+
         setMessages(...messages, data);
         // setMessages((prev) => [...prev, data]);
 
@@ -73,7 +74,7 @@ const Chat = () => {
     }, []);
 
     useEffect(() => {
-        (arrivalMessage && (arrivalMessage?.sender===id) && (user?.result?.googleId === arrivalMessage?.receiver || (user?.result?._id === arrivalMessage?.receiver)) && setMessages((prev) => [...prev, arrivalMessage]));
+        (arrivalMessage && (arrivalMessage?.sender === id) && (user?.result?.googleId === arrivalMessage?.receiver || (user?.result?._id === arrivalMessage?.receiver)) && setMessages((prev) => [...prev, arrivalMessage]));
     }, [arrivalMessage])
 
     useEffect(() => {
@@ -103,7 +104,7 @@ const Chat = () => {
     const send = () => {
 
         const message = document.getElementById('chatInput').value;
-        const shouldSent= !(!message?.length  || ((!message || /^\s*$/.test(message))))
+        const shouldSent = !(!message?.length || ((!message || /^\s*$/.test(message))))
         const conversationId = (String(user?.result?.googleId || (user?.result?._id)) > String(id) ?
             (`${String(user?.result?.googleId || (user?.result?._id))}-${id}`) :
             ((`${id}-${String(user?.result?.googleId || (user?.result?._id))}`)));
@@ -115,7 +116,7 @@ const Chat = () => {
                 createdAt: Date.now(),
                 receiver: id,
                 conversationId: conversationId,
-                seen:online
+                seen: online
 
             }
             const smss = {
@@ -123,7 +124,7 @@ const Chat = () => {
                 text: message,
                 receiver: id,
                 conversationId: conversationId,
-                seen:online
+                seen: online
             }
             socket?.current?.emit("TypingSend", { id: id, temp: false });
 
@@ -139,7 +140,7 @@ const Chat = () => {
             if (!sent && !online) {
                 setSent(true);
                 dispatch(SendMailToUser({ id: id, senderId: (user?.result?.googleId || user?.result?._id), message: message, Name: user?.result?.name }))
-                dispatch(AddNotification({id:id,data:`${user?.result?.name} sent you a message`,seen:false}))
+                dispatch(AddNotification({ id: id, data: `${user?.result?.name} sent you a #message#https://hemant-sahu.netlify.app/direct/${(user?.result?.googleId || user?.result?._id)}`, seen: false }))
             }
             document.getElementById('chatInput').value = "";
 
@@ -150,41 +151,45 @@ const Chat = () => {
     // console.log(messages);
     // console.log(typing);
     return (
-        <div className="chatPage">
-            <div className="chatContainer">
-                <div className="header">
-                    <h2>{username}</h2>
+        <>
+            <Navbar />
+            <div className="chatPage">
+                <div className="chatContainer">
+                    <div className="header">
+                        <h2>{username}</h2>
+                        {
+                            ((online && typing) ?
+                                (<h5>Typing....</h5>)
+                                :
+                                ((online) && (<h5>Online</h5>))
+                            )
+                        }
+                    </div>
                     {
-                        ((online && typing) ?
-                            (<h5>Typing....</h5>)
-                            :
-                            ((online) && (<h5>Online</h5>))
-                        )
+                        ((!messages) ? (<h1>No messages yet</h1>) : (
+                            <ReactScrollToBottom className="chatBox">
+
+                                {messages?.map((item, i) =>
+
+                                    <Message seen={item.seen && (item.sender === (user?.result?._id) || item.sender === (user?.result?.googleId))} time={item.createdAt} message={item.text} classs={(item.sender === (user?.result?._id) || item.sender === (user?.result?.googleId)) ? 'right' : 'left'} />
+
+
+
+                                )}
+
+                            </ReactScrollToBottom>
+                        ))
                     }
-                </div>
-                {
-                    ((!messages) ? (<h1>No messages yet</h1>) : (
-                        <ReactScrollToBottom className="chatBox">
-                            
-                            {messages?.map((item, i) =>
-                           
-                                   <Message seen={item.seen && (item.sender === (user?.result?._id) || item.sender === (user?.result?.googleId) )} time={item.createdAt} message={item.text} classs={(item.sender === (user?.result?._id) || item.sender === (user?.result?.googleId)) ? 'right' : 'left'} />
-                            
-                         
-                                  
-                            )}
 
-                        </ReactScrollToBottom>
-                    ))
-                }
-
-                <div className="inputBox">
-                    <input onChange={f} onKeyPress={(event) => event.key === 'Enter' ? send() : null} type="text" id="chatInput" />
-                    <button onClick={send} className="sendBtn"><SendIcon fontSize="large"/></button>
+                    <div className="inputBox">
+                        <input onChange={f} onKeyPress={(event) => event.key === 'Enter' ? send() : null} type="text" id="chatInput" />
+                        <button onClick={send} className="sendBtn"><SendIcon fontSize="large" /></button>
+                    </div>
                 </div>
+
             </div>
+        </>
 
-        </div>
     )
 }
 

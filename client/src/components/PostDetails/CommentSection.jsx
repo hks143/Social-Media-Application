@@ -5,24 +5,41 @@ import { FindNotification,AddNotification,ClearNotification ,FindUnseenNotes, Se
 import VerifiedIcon from '@mui/icons-material/Verified';
 import { commentPost } from '../../actions/posts';
 import useStyles from './styles';
+import { io } from 'socket.io-client'
 import { useHistory, useLocation } from 'react-router-dom';
 
 const CommentSection = ({ post, id }) => {
   const user = JSON.parse(localStorage.getItem('profile'));
   const [comment, setComment] = useState('');
-
-  const mylove = post?.comments;
+  const socket=useRef();
+  const ArrayOfComments = post?.comments;
 
   const location = useLocation();
   const dispatch = useDispatch();
   const history = useHistory();
-  const [comments, setComments] = useState(mylove);
+  const [comments, setComments] = useState(ArrayOfComments);
   const classes = useStyles();
   const commentsRef = useRef();
   const [showComment, setShowComment] = useState(0);
   const tt = () => {
     setShowComment(1 - showComment);
   }
+  useEffect(()=>{
+    socket.current = io("https://socketioprojectchatappp.herokuapp.com/"); 
+    socket.current.on("getComment",data=>{
+      if(data.ID===post._id){
+      setComments((prev)=>{
+        return [...prev,data.comment];
+      })
+    }
+    })
+  
+  },[])
+
+//   useEffect(() => {
+//     socket?.current?.emit("addUserForComment", (user?.result?.googleId || user?.result?._id));
+    
+// }, [user]);
   useEffect(() => {
 
     if (comments) setComments(comments);
@@ -31,12 +48,19 @@ const CommentSection = ({ post, id }) => {
 
   const handleComment = async () => {
     const p = comment;
-    setComments([...comments, `${user?.result?.name}: ${p}:${user?.result?.googleId}`]);
+    // setComments([...comments, ]);
 
     setComment('');
     commentsRef.current.scrollIntoView({ behavior: 'smooth' });
+    socket.current.emit("IncrementBadge",{
+         ID:post?.creator,
+         liker:1,
+         remove:true,
+         isLike:false
+    })
+    socket.current.emit("SendComment",{ID:post._id,comment:`${user?.result?.name}: ${p}`});
     dispatch(commentPost(`${user?.result?.name}: ${p}:${user?.result?.googleId}`, post._id));
-    dispatch(AddNotification({id:(post?.creator), data:`${user?.result?.name} commented on your post`,seen:false}));
+    dispatch(AddNotification({id:(post?.creator), data:`${user?.result?.name} commented on your #post#https://hemant-sahu.netlify.app/${post._id}`,seen:false}));
 
   };
 

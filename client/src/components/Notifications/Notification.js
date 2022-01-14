@@ -8,6 +8,7 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { IconButton } from '@mui/material';
 import moment from 'moment'
 import { FindNotification, ClearNotification, AddNotification } from '../../actions/direct'
+import Navbar from '../Navbar/Navbar';
 const Mychat = () => {
     const classes = useStyles();
     const history = useHistory();
@@ -30,30 +31,36 @@ const Mychat = () => {
     }, []);
 
     return (
+
         !(state?.length) ? (
-            <Paper className={classes.home} >
-                <div className={classes.paper}>
-                    <Typography variant="h6">No new notifications</Typography>
-                </div>
-            </Paper>
+            <>
+                <Navbar />
+                <Paper className={classes.home} >
+                    <div className={classes.paper}>
+                        <Typography variant="h6">No new notifications</Typography>
+                    </div>
+                </Paper>
+            </>
+
         )
             :
             (
                 <>
+                    <Navbar />
                     {
 
                         state?.slice(0).reverse().map((item, i) => (
                             <>
-                          
-                                    <Paper className={classes.home} >
-                                        <div className={classes.paper}>
-                                            {/* <AccountCircleIcon color="primary" /> */}
-                                          
-                                            <Typography variant="text">{`${item.notification}`}</Typography>
-                                            <Typography variant="caption">{`~${moment(item.createdAt).fromNow()}`}</Typography>
-                                        </div>
-                                    </Paper>
-                                    
+
+                                <Paper className={classes.home} >
+                                    <div className={classes.paper}>
+                                        {/* <AccountCircleIcon color="primary" /> */}
+
+                                        <Typography variant="text">{`${item.notification.split('#')[0]}`} <a href={`${item.notification.split('#')[2]}`}>{item.notification.split('#')[1]}</a></Typography>
+                                        <Typography variant="caption">{`${moment(item.createdAt).format('lll')}`}</Typography>
+                                    </div>
+                                </Paper>
+
                                 <div>&nbsp;</div>
                             </>
 

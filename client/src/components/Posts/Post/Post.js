@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useReducer, useRef, useState, useEffect } from 'react';
 import { Card, CardActions, CardContent, CardMedia, Button, Typography } from '@material-ui/core/';
 import DeleteIcon from '@material-ui/icons/Delete';
 import FavoriteIcon from '@material-ui/icons/Favorite';
@@ -19,10 +19,11 @@ import DialogTitle from '@mui/material/DialogTitle';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import { useDispatch } from 'react-redux';
 import moment from 'moment';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import { likePost, deletePost } from '../../../actions/posts';
 import { FindNotification, AddNotification, ClearNotification, FindUnseenNotes, SetNotesSeen } from '../../../actions/direct'
 import useStyles from './styles';
+import { io } from 'socket.io-client'
 const Post = ({ post, setCurrentId }) => {
   const dispatch = useDispatch();
   const [op, setOpen] = useState(false);
@@ -32,6 +33,29 @@ const Post = ({ post, setCurrentId }) => {
   const classes = useStyles();
   const user = JSON.parse(localStorage.getItem('profile'));
   const history = useHistory();
+  const socket = useRef();
+  useEffect(() => {
+    socket.current = io("https://socketioprojectchatappp.herokuapp.com/");
+    socket?.current?.on("IncrementBadge", (data) => {
+      if (data.isLike === true) {
+        // if (data.liker !== user?.result?._id && (data.liker !== user?.result?.googleId)) {
+          if (data.remove === false) {
+            // setLikes([...post?.likes, data.liker]);
+            setLikes((prev)=>{return [...prev,data.liker]});
+          }
+          else {
+            // setLikes(post?.likes.filter((id) => id !== data.liker));
+            setLikes((prev)=>{
+                return prev.filter((id)=>id!=data.liker);
+            })
+          }
+        // }
+      }
+    })
+
+
+    
+  }, [])
   const openChat = () => {
     if (!user) {
       alert(`Sign in to chat with ${post.name}`);
@@ -92,14 +116,33 @@ const Post = ({ post, setCurrentId }) => {
     dispatch(likePost(post._id));
 
     if (hasLikedPost) {
-      setLikes(post?.likes.filter((id) => id !== userId));
-      if (post.creator !== (user?.result?.googleId) && (post.creator !== (user?.result?._id)))
-        dispatch(AddNotification({ id: (post?.creator), data: `${user?.result?.name} unliked your post`, seen: false }))
+      // setLikes(post?.likes.filter((id) => id !== userId));
+      socket?.current.emit("IncrementBadge", {
+        ID: post.creator,
+        liker: (user?.result?._id || (user?.result?.googleId)),
+        remove: true,
+        isLike: true
+
+      })
+
+     
+      // if (post.creator !== (user?.result?.googleId) && (post.creator !== (user?.result?._id)))
+        dispatch(AddNotification({ id: (post?.creator), data: `${user?.result?.name} unliked your #post#https://hemant-sahu.netlify.app/${post._id}`, seen: false }))
     } else {
-      setLikes([...post?.likes, userId]);
-      if (post.creator !== (user?.result?.googleId) && (post.creator !== (user?.result?._id)))
-        dispatch(AddNotification({ id: (post?.creator), data: `${user?.result?.name} liked your post`, seen: false }))
+      // setLikes([...post?.likes, userId]);
+      socket?.current.emit("IncrementBadge", {
+        ID: post.creator,
+        liker: (user?.result?._id || (user?.result?.googleId)),
+        remove: false,
+        isLike: true
+      })
+     
+      // if (post.creator !== (user?.result?.googleId) && (post.creator !== (user?.result?._id)))
+        dispatch(AddNotification({ id: (post?.creator), data: `${user?.result?.name} liked your #post#https://hemant-sahu.netlify.app/${post._id}`, seen: false }))
+
     }
+ 
+
 
   };
   const Likes = () => {
@@ -120,7 +163,10 @@ const Post = ({ post, setCurrentId }) => {
   return (
 
     <Card className={classes.card}>
-      <CardMedia className={classes.media} image={post.selectedFile || 'https://user-images.githubusercontent.com/194400/49531010-48dad180-f8b1-11e8-8d89-1e61320e1d82.png'} title={post.title} />
+      {/* <Link to={`/${post._id}`}> */}
+        <CardMedia onDoubleClick={handleLike} className={classes.media} image={post.selectedFile || 'https://user-images.githubusercontent.com/194400/49531010-48dad180-f8b1-11e8-8d89-1e61320e1d82.png'} title={post.title} />
+      {/* </Link> */}
+
       <div className={classes.details}>
         <Typography variant="body2" color="textSecondary" component="h2">{post.tags.map((tag) => `#${tag} `)}</Typography>
 
@@ -137,7 +183,7 @@ const Post = ({ post, setCurrentId }) => {
 
       }
 
-      <Typography className={classes.title} variant="body2" component="h2">{moment(post.createdAt).fromNow()}</Typography>
+      <Typography className={classes.title} variant="body2" component="h2">{moment(post.createdAt).format('lll')}</Typography>
       {
 
         (post?.message?.match(/(\w+)/g)?.length > 10 ? (

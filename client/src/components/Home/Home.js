@@ -6,6 +6,7 @@ import { getPosts } from '../../actions/posts';
 import Posts from '../Posts/Posts';
 import Form from '../Form/Form';
 import useStyles from './styles';
+import Navbar from '../Navbar/Navbar'
 const Home = () => {
   const [currentId, setCurrentId] = useState(0);
   const dispatch = useDispatch();
@@ -15,7 +16,9 @@ const Home = () => {
   }, [currentId, dispatch]);
 
   return (
-    <Grow in>
+    <>
+    <Navbar/>
+     <Grow in>
       <Container>
         <Grid
           className={classes.mainContainer}
@@ -55,6 +58,8 @@ const Home = () => {
         </Grid>
       </Container>
     </Grow>
+    </>
+   
   );
 };
 

@@ -165,7 +165,7 @@ const SignUp = () => {
           }
 
           <GoogleLogin
-            clientId={`${process.env.clientId}`}
+            clientId={process.env.clientId}
             render={(renderProps) => (
               <Button className={classes.googleButton} color="primary" fullWidth onClick={renderProps.onClick} disabled={renderProps.disabled} startIcon={<Icon />} variant="contained">
                 Sign In with Google

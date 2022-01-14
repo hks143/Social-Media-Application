@@ -33,6 +33,13 @@ io.on("connection", (socket) => {
     io.emit("getUsers", users);
   });
 
+ 
+socket.on("SendComment",({ID,comment})=>{
+   io.emit("getComment",{
+     ID,
+     comment
+   });
+})
   //send and get message
   socket.on("sendMessage", ({ senderId, receiverId, text }) => {
     const user = getUser(receiverId);
@@ -42,6 +49,28 @@ io.on("connection", (socket) => {
       text,
     });
   });
+  socket.on("IncrementBadge",({ID,liker,remove,isLike})=>{
+       io.emit("IncrementBadge",{
+            ID,
+            liker,
+            remove,
+            isLike
+
+       })
+  })
+
+  socket.on("PushNotification",({notification,receiver,createdAt})=>{
+      io.emit("PushNotification",{
+        notification,
+        receiver,
+        createdAt
+      })
+  })
+  socket.on("ONLINE",({receiver})=>{
+     io.emit("ONLINE",{
+        receiver
+     })
+  })
   socket.on("TypingSend",({id,temp})=>{
     const user = getUser(id);
     // console.log(temp);

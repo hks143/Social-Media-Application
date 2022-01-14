@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AppBar, Typography, Toolbar, Avatar, Button } from '@material-ui/core';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -12,7 +12,7 @@ import LoginIcon from '@mui/icons-material/Login';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { FindNotification, AddNotification, ClearNotification, FindUnseenNotes, SetNotesSeen } from '../../actions/direct.js'
 import useStyles from './styles';
-
+import { io } from 'socket.io-client'
 const Navbar = () => {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('profile')));
   const dispatch = useDispatch();
@@ -20,6 +20,7 @@ const Navbar = () => {
   const history = useHistory();
   const classes = useStyles();
   const [badge, setBadge] = useState(10001);
+  const socket=useRef();
   const logout = () => {
     dispatch({ type: 'LOGOUT' });
 
@@ -33,12 +34,20 @@ const Navbar = () => {
     history.push('/notifications');
 
   }
+
   useEffect(async () => {
     if (user) {
       const data = await dispatch(FindUnseenNotes({ id: (user?.result?.googleId || user?.result?._id) }))
       // console.log(data);
       setBadge(data?.length);
       // console.log(data,badge);
+      socket.current = io("https://socketioprojectchatappp.herokuapp.com/");
+ 
+      socket?.current?.on("IncrementBadge",(data)=>{
+        if(user?.result?._id===data?.ID || user?.result?.googleId===data?.ID){
+          setBadge(prev=>prev+1);
+        }
+    })
      
     }
   }, [])
