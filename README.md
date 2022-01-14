@@ -1,9 +1,10 @@
 # QuickShare
 # <a href="https://hemant-sahu.netlify.app/">Live Demo</a>
 # About
-A simple social media application with users, posts, likes,comments and messages - developed using React, Node, Express and MongoDB.
+A Realtime social media application with users, posts, likes,comments and messages - developed using React, Node, Express,MongoDB and SocketIO.
 # Features 
-- It's a full stack MERN application where user can signup and then sign in with corresponding details.
+- Every feature of this application is realtime.
+- Users can signup and signin.
 - Users can also sign in with Google account.
 - SignIn via OTP.
 - Forget Password feature is available.
