@@ -8,6 +8,7 @@ A Realtime social media application with users, posts, likes,comments and messag
 - Users can also sign in with Google account.
 - SignIn via OTP.
 - Forget Password feature is available.
+- Profile page shows user details and posts with following and followers menu.
 - Users can create a post and then edit or delete their post.
 - Users can like and comment.
 - Real-time chat is supported.
