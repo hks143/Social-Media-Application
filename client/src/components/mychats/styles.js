@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 export default makeStyles({
  
   paper:{
-     height:'50px',
+     minHeight:'50px',
      display:'flex',
     //  padding:'10px',
     paddingTop:'5px',

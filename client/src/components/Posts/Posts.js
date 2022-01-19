@@ -28,7 +28,7 @@ const Posts = ({ setCurrentId }) => {
             <>
             <div> &nbsp;</div>
             <Grid key={post._id} item xs={12} sm={12} md={12}>
-              <Post  post={post}  setCurrentId={setCurrentId} />
+              <Post showEditIcon={1} post={post}  setCurrentId={setCurrentId} />
             </Grid>
              </>
           )) }

@@ -13,6 +13,7 @@ import SendIcon from '@mui/icons-material/Send';
 import { io } from 'socket.io-client'
 import { AddNotification, FindNotification, ClearNotification, SendMailToUser, FindUserForChat, GetDirectMessage, createMessage } from '../../actions/direct';
 import Navbar from '../Navbar/Navbar';
+import { Paper } from '@material-ui/core';
 const initial = { sender: '', receiver: '', createdAt: Date.now(), text: '' }
 const Chat = () => {
     const { p } = useSelector((state) => state);
@@ -155,16 +156,21 @@ const Chat = () => {
             <Navbar />
             <div className="chatPage">
                 <div className="chatContainer">
-                    <div className="header">
-                        <h2>{username}</h2>
-                        {
-                            ((online && typing) ?
-                                (<h5>Typing....</h5>)
-                                :
-                                ((online) && (<h5>Online</h5>))
-                            )
-                        }
-                    </div>
+                   <Paper elevation={7}>
+
+                        <Button variant='text' onClick={()=>{history.push(`/profile/${id}`)}}>
+
+                            <h3>{`${username} `}</h3>
+                            {
+                                ((online && typing) ?
+                                    (<h6>Typing....</h6>)
+                                    :
+                                    ((online) && (<h6>Online</h6>))
+                                )
+                            }
+                        </Button>
+                   </Paper>
+                    
                     {
                         ((!messages) ? (<h1>No messages yet</h1>) : (
                             <ReactScrollToBottom className="chatBox">

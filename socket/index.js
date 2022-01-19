@@ -58,7 +58,11 @@ socket.on("SendComment",({ID,comment})=>{
 
        })
   })
-
+socket.on("ChangeFollower",({number})=>{
+   io.emit("ChangeFollower",{
+      number
+   })
+})
   socket.on("PushNotification",({notification,receiver,createdAt})=>{
       io.emit("PushNotification",{
         notification,

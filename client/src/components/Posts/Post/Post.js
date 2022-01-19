@@ -9,6 +9,7 @@ import EditIcon from '@material-ui/icons/Edit'
 import Badge from '@mui/material/Badge';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
+import { IconButton } from '@mui/material';
 import CommentIcon from '@mui/icons-material/Comment';
 import ShareIcon from '@mui/icons-material/Share';
 import Dialog from '@mui/material/Dialog';
@@ -17,14 +18,17 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import VerifiedIcon from '@mui/icons-material/Verified';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useDispatch } from 'react-redux';
 import moment from 'moment';
-import { useHistory, Link } from 'react-router-dom';
+import { useHistory, Link, useLocation } from 'react-router-dom';
 import { likePost, deletePost } from '../../../actions/posts';
 import { FindNotification, AddNotification, ClearNotification, FindUnseenNotes, SetNotesSeen } from '../../../actions/direct'
 import useStyles from './styles';
 import { io } from 'socket.io-client'
-const Post = ({ post, setCurrentId }) => {
+const Post = ({ post, setCurrentId, showEditIcon }) => {
   const dispatch = useDispatch();
   const [op, setOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
@@ -33,35 +37,40 @@ const Post = ({ post, setCurrentId }) => {
   const classes = useStyles();
   const user = JSON.parse(localStorage.getItem('profile'));
   const history = useHistory();
+  const location = useLocation();
+  // console.log(location);
   const socket = useRef();
+  const ShowProfile = () => {
+    history.push(`/profile/${post.creator}`);
+  }
   useEffect(() => {
     socket.current = io("https://socketioprojectchatappp.herokuapp.com/");
     socket?.current?.on("IncrementBadge", (data) => {
       if (data.isLike === true) {
         // if (data.liker !== user?.result?._id && (data.liker !== user?.result?.googleId)) {
-          if (data.remove === false) {
-            // setLikes([...post?.likes, data.liker]);
-            setLikes((prev)=>{return [...prev,data.liker]});
-          }
-          else {
-            // setLikes(post?.likes.filter((id) => id !== data.liker));
-            setLikes((prev)=>{
-                return prev.filter((id)=>id!=data.liker);
-            })
-          }
+        if (data.remove === false) {
+          // setLikes([...post?.likes, data.liker]);
+          setLikes((prev) => { return [...prev, data.liker] });
+        }
+        else {
+          // setLikes(post?.likes.filter((id) => id !== data.liker));
+          setLikes((prev) => {
+            return prev.filter((id) => id != data.liker);
+          })
+        }
         // }
       }
     })
 
 
-    
+
   }, [])
   const openChat = () => {
     if (!user) {
       alert(`Sign in to chat with ${post.name}`);
     }
 
-    history.push(`direct/${post?.creator}`);
+    history.push(`/direct/${post?.creator}`);
   }
   const toggleReadMore = () => {
     setIsReadMore(!isReadMore);
@@ -125,9 +134,9 @@ const Post = ({ post, setCurrentId }) => {
 
       })
 
-     
+
       // if (post.creator !== (user?.result?.googleId) && (post.creator !== (user?.result?._id)))
-        dispatch(AddNotification({ id: (post?.creator), data: `${user?.result?.name} unliked your #post#https://hemant-sahu.netlify.app/${post._id}`, seen: false }))
+      dispatch(AddNotification({ id: (post?.creator), data: `${user?.result?.name} unliked your #post#https://hemant-sahu.netlify.app/${post._id}`, seen: false }))
     } else {
       // setLikes([...post?.likes, userId]);
       socket?.current.emit("IncrementBadge", {
@@ -136,12 +145,12 @@ const Post = ({ post, setCurrentId }) => {
         remove: false,
         isLike: true
       })
-     
+
       // if (post.creator !== (user?.result?.googleId) && (post.creator !== (user?.result?._id)))
-        dispatch(AddNotification({ id: (post?.creator), data: `${user?.result?.name} liked your #post#https://hemant-sahu.netlify.app/${post._id}`, seen: false }))
+      dispatch(AddNotification({ id: (post?.creator), data: `${user?.result?.name} liked your #post#https://hemant-sahu.netlify.app/${post._id}`, seen: false }))
 
     }
- 
+
 
 
   };
@@ -164,7 +173,7 @@ const Post = ({ post, setCurrentId }) => {
 
     <Card className={classes.card}>
       {/* <Link to={`/${post._id}`}> */}
-        <CardMedia onDoubleClick={handleLike} className={classes.media} image={post.selectedFile || 'https://user-images.githubusercontent.com/194400/49531010-48dad180-f8b1-11e8-8d89-1e61320e1d82.png'} title={post.title} />
+      <CardMedia onDoubleClick={handleLike} className={classes.media} image={post.selectedFile || 'https://user-images.githubusercontent.com/194400/49531010-48dad180-f8b1-11e8-8d89-1e61320e1d82.png'} title={post.title} />
       {/* </Link> */}
 
       <div className={classes.details}>
@@ -175,10 +184,10 @@ const Post = ({ post, setCurrentId }) => {
 
       {
         (post?.creator === "107825854419209828003") ? (
-          <Typography className={classes.title} gutterBottom variant="h5" component="h2">{post.name}{<VerifiedIcon color="primary" />}</Typography>
+          <Typography className={classes.title} gutterBottom variant="h5" component="h2">{post.name}{<VerifiedIcon color="primary" />}{<IconButton color='primary' fontSize='small' onClick={ShowProfile}><VisibilityIcon /></IconButton>}</Typography>
         ) :
-          (post?.creator !== 107825854419209828003) && (
-            <Typography className={classes.title} gutterBottom variant="h5" component="h2">{post.name}</Typography>
+          (post?.creator !== "107825854419209828003") && (
+            <Typography className={classes.title} gutterBottom variant="h5" component="h2">{post.name}{<IconButton onClick={ShowProfile} color='primary' fontSize='small'><VisibilityIcon /></IconButton>}</Typography>
           )
 
       }
@@ -233,10 +242,16 @@ const Post = ({ post, setCurrentId }) => {
           ))
         }
 
+        <a href={`whatsapp://send?text=Click on the link to see ${post.name}'s post on QuickShare https://hemant-sahu.netlify.app/${post._id}`}>
+
+          <WhatsAppIcon fontSize='small' />
+        </a>
+
 
         <Button onClick={CopyToClipboard} color="primary" >
-          <ShareIcon fontSize="small" />
+          <ContentCopyIcon fontSize='small' />
         </Button>
+
         <Button disabled={!user} onClick={download} color="primary" >
           <DownloadIcon fontSize="small" />
         </Button>
@@ -267,9 +282,14 @@ const Post = ({ post, setCurrentId }) => {
           ))
         }
 
-        <Button disabled={!(user?.result?.googleId === post?.creator || user?.result?._id === post?.creator)} onClick={f} size="small" color="primary" >
-          <EditIcon fontSize="small" />
-        </Button>
+        {
+          ((showEditIcon === 1) && (
+
+            <Button disabled={!(user?.result?.googleId === post?.creator || user?.result?._id === post?.creator)} onClick={f} size="small" color="primary" >
+              <EditIcon fontSize="small" />
+            </Button>
+          ))
+        }
 
 
         <Button disabled={!(user?.result?.googleId === post?.creator || user?.result?._id === post?.creator)} size="small" color="primary" onClick={handleClickopen}>

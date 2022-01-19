@@ -12,12 +12,12 @@ const CommentSection = ({ post, id }) => {
   const user = JSON.parse(localStorage.getItem('profile'));
   const [comment, setComment] = useState('');
   const socket=useRef();
-  const ArrayOfComments = post?.comments;
+  const mylove = post?.comments;
 
   const location = useLocation();
   const dispatch = useDispatch();
   const history = useHistory();
-  const [comments, setComments] = useState(ArrayOfComments);
+  const [comments, setComments] = useState(mylove);
   const classes = useStyles();
   const commentsRef = useRef();
   const [showComment, setShowComment] = useState(0);
@@ -59,7 +59,7 @@ const CommentSection = ({ post, id }) => {
          isLike:false
     })
     socket.current.emit("SendComment",{ID:post._id,comment:`${user?.result?.name}: ${p}`});
-    dispatch(commentPost(`${user?.result?.name}: ${p}:${user?.result?.googleId}`, post._id));
+    dispatch(commentPost(`${user?.result?.name}: ${p}:${user?.result?.googleId||(user?.result?._id)}`, post._id));
     dispatch(AddNotification({id:(post?.creator), data:`${user?.result?.name} commented on your #post#https://hemant-sahu.netlify.app/${post._id}`,seen:false}));
 
   };
@@ -75,7 +75,8 @@ const CommentSection = ({ post, id }) => {
           {comments?.map((c, i) => (
             (showComment === 1) && (
               <Typography key={i} gutterBottom variant="body2" >
-                <strong>{c.split(': ')[0]}</strong>
+                <Button variant='text' color='primary' onClick={()=>{history.push(`/profile/${c.split(':')[2]}`)}}>{c.split(': ')[0]}</Button>
+                {/* <strong>{c.split(': ')[0]}</strong> */}
                 {
                   (c.includes('107825854419209828003') && (
                     <VerifiedIcon color="primary" fontSize="inherit" />)

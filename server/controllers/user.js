@@ -6,16 +6,17 @@ import LoginModal from "../models/loginUsers.js"
 import nodemailer from 'nodemailer';
 import Message from '../models/message.js'
 import user from "../models/user.js";
+import PostMessage from "../models/postMessage.js"
 import Notification from "../models/notification.js";
 
 const secret = `${process.env.secret_key}`;
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-   
+
     user: 'quickshare56@gmail.com',
     pass: `${process.env.password}`
-   
+
   }
 });
 
@@ -122,7 +123,7 @@ export const loginUser = async (req, res) => {
   const ind = await LoginModal.findOne({ email: req.body.email }).exec();
   // console.log(ind);
   if (!ind) {
-   
+
     var mailOptions = {
       from: 'QuickShare <quickshare56@gmail.com>',
       to: `${email}`,
@@ -143,14 +144,14 @@ export const loginUser = async (req, res) => {
       res.status(201);
     } catch (error) {
       res.status(500).json({ message: "Something went wrong" });
-  
+
       console.log(error);
     }
   }
-  else{
+  else {
     res.status(201);
   }
- 
+
 };
 
 export const requestOtpLogin = async (req, res) => {
@@ -209,7 +210,7 @@ export const loginviaOTP = async (req, res) => {
 
   }
   catch (error) {
-    console.log("error= ",error);
+    console.log("error= ", error);
     res.status(401).send('Something went wrong');
   }
 }
@@ -273,16 +274,15 @@ export const FindUserForChat = async (req, res) => {
   // console.log(req.body);
   try {
     const User = await LoginModal.findOne({ id });
-
+    const post = await PostMessage.find({ creator: id });
     if (!User) return res.status(400).json({ message: "User doesn't exists" });
 
-    res.status(201).json({ name: `${User.firstname} ${User.lastname}` });
-
+    res.status(201).json({ name: `${User.firstname} ${User.lastname}`, email: `${User.email}`, JoinedOn: User.when, follower: User?.follower, following: User?.following, post: post });
 
   } catch (error) {
-
-    res.status(401).json({ message: "Something went wrong" });
     console.log(error);
+    res.status(401).json({ message: "Something went wrong" });
+
   }
 };
 
@@ -320,7 +320,7 @@ export const SendMailToUser = async (req, res) => {
   }
 };
 
-export const Mychats= async (req, res) => {
+export const Mychats = async (req, res) => {
 
   try {
     const User = await LoginModal.find();
@@ -338,14 +338,14 @@ export const Mychats= async (req, res) => {
 };
 
 export const AddNotification = async (req, res) => {
-  const id  = req.body.id;
-  const data=req.body.data;
-  const seen=req.body.seen
-  const newNote=new Notification({id,notification:data,seen,createdAt:Date.now()})
+  const id = req.body.id;
+  const data = req.body.data;
+  const seen = req.body.seen
+  const newNote = new Notification({ id, notification: data, seen, createdAt: Date.now() })
   try {
-    
-   await newNote.save();
-   res.status(200).json(newNote);
+
+    await newNote.save();
+    res.status(200).json(newNote);
 
 
   } catch (error) {
@@ -356,12 +356,12 @@ export const AddNotification = async (req, res) => {
 };
 
 export const FindNotification = async (req, res) => {
-  const id  = req.body.id;
- 
+  const id = req.body.id;
+
   try {
-    
-   const newNote=await Notification.find({id})
-   res.status(201).json(newNote);
+
+    const newNote = await Notification.find({ id })
+    res.status(201).json(newNote);
 
 
   } catch (error) {
@@ -372,10 +372,10 @@ export const FindNotification = async (req, res) => {
 };
 
 export const ClearNotification = async (req, res) => {
-  const id  = req.body.id;
-  try{
-  const newNote=await Notification.deleteMany({id});
-  res.status(201).json(newNote);
+  const id = req.body.id;
+  try {
+    const newNote = await Notification.deleteMany({ id });
+    res.status(201).json(newNote);
 
 
   } catch (error) {
@@ -386,10 +386,10 @@ export const ClearNotification = async (req, res) => {
 };
 
 export const FindUnseenNotes = async (req, res) => {
-  const id  = req.body.id;
-  try{
-  const newNote=await Notification.find({id,seen:false});
-  res.status(201).json(newNote);
+  const id = req.body.id;
+  try {
+    const newNote = await Notification.find({ id, seen: false });
+    res.status(201).json(newNote);
 
 
   } catch (error) {
@@ -400,16 +400,69 @@ export const FindUnseenNotes = async (req, res) => {
 };
 
 export const SetNotesSeen = async (req, res) => {
-  const id  = req.body.id;
-  try{
-    await Notification.updateMany({ seen: false, id:id }, { $set: { seen: true } }, { new: true });
-  res.status(201).json({msg:"ok"});
+  const id = req.body.id;
+  try {
+    await Notification.updateMany({ seen: false, id: id }, { $set: { seen: true } }, { new: true });
+    res.status(201).json({ msg: "ok" });
 
 
   } catch (error) {
 
     res.status(401).json({ message: "Something went wrong" });
     console.log(error);
+  }
+};
+
+export const FollowUnfollow = async (req, res) => {
+  const { Follower, FollowedBy } = req.body;
+
+  try {
+    const FollowerUser = await LoginModal.find({ id: Follower });
+    const FollowedByUser = await LoginModal.find({ id: FollowedBy });
+
+    if (!FollowerUser || (!FollowedByUser)) {
+      res.status(401).json({ error: "User doesn't exist" });
+    }
+
+    const index = FollowerUser[0].following.findIndex((id) => id === String(FollowedBy));
+
+    if (index === -1) {
+      FollowerUser[0].following.push(FollowedBy);
+      FollowedByUser[0].follower.push(Follower);
+
+      try{
+        var mailOptions = {
+          from: 'QuickShare <quickshare56@gmail.com>',
+          to: `${FollowedByUser[0].email}`,
+          subject: `Someone Started Following You`,
+          html: `<p>Hi ${FollowedByUser[0].firstname} ${FollowedByUser[0].lastname},</p> <p>${FollowerUser[0].firstname} ${FollowerUser[0].lastname} started following you. Check your <a href="https://hemant-sahu.netlify.app/profile/${FollowedBy}">profile</a> for more details.</p>`
+        };
+    
+        transporter.sendMail(mailOptions, function (error, info) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log('Email sent: ' + info.response);
+          }
+        });
+      }
+      catch(error){
+        console.log(error);
+      }
+
+    }
+    else {
+      FollowerUser[0].following = FollowerUser[0].following.filter((id) => id !== FollowedBy);
+      FollowedByUser[0].follower = FollowedByUser[0].follower.filter((id) => id !== Follower);
+    }
+
+    const updatedFollower = await LoginModal.findByIdAndUpdate(FollowerUser[0]._id, FollowerUser[0], { new: true })
+    const updatedFollowing = await LoginModal.findByIdAndUpdate(FollowedByUser[0]._id, FollowedByUser[0], { new: true })
+    // console.log(updatedFollower,updatedFollowing);
+  }
+  catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Somothing went wrong" });
   }
 };
 

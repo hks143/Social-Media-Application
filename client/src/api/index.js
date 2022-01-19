@@ -31,6 +31,7 @@ export const SendMailToUser=(data)=>API.post('user/SendMailToUser', data);
 export const AddNotification=(data)=>API.post('user/addNotification', data);
 export const FindNotification=(data)=>API.post('user/findNotification', data);
 export const ClearNotification=(data)=>API.post('user/clearNotification', data);
+export const FollowUnfollow=(data)=>API.patch('user/followUnfollow',data);
 export const FindUnseenNotes=(data)=>API.post('user/findUnseenNotes', data);
 export const SetNotesSeen=(data)=>API.post('user/SetNotesSeen', data);
 export const Mychats=()=>API.get('user/Mychats');

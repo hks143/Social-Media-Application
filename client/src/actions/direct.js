@@ -40,7 +40,7 @@ export const createMessage = (Data) => async (dispatch) => {
     try {
       // console.log(ID);
       const { data } = await api.FindUserForChat(ID);
-      // console.log(data);
+      console.log(data);
       return data;
      
     } catch (error) {
@@ -125,3 +125,13 @@ export const createMessage = (Data) => async (dispatch) => {
     }
   }; 
 
+  export const FollowUnfollow=(data)=>async(dispatch)=>{
+    try{
+         await api.FollowUnfollow(data);
+    }
+    catch(error){
+       console.log(error);
+    }
+  }
+
+ 

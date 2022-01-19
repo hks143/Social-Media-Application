@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 
-import { Mychats,SendMailToUser,FindUserForChat, GetDirectPost,directPost,signin, signup, loginUser, requestOtp, requestOtpLogin, changePassword, loginviaOTP, AddNotification, FindNotification, ClearNotification, FindUnseenNotes, SetNotesSeen } from "../controllers/user.js";
+import {FollowUnfollow, Mychats,SendMailToUser,FindUserForChat, GetDirectPost,directPost,signin, signup, loginUser, requestOtp, requestOtpLogin, changePassword, loginviaOTP, AddNotification, FindNotification, ClearNotification, FindUnseenNotes, SetNotesSeen } from "../controllers/user.js";
 import auth from "../middleware/auth.js";
 
 router.post("/FindUserForChat",auth,FindUserForChat);
@@ -21,5 +21,6 @@ router.post("/requestotp", requestOtp);
 router.post("/requestotpLogin", requestOtpLogin);
 router.post("/loginviaOTP", loginviaOTP);
 router.patch("/changePassword", changePassword);
+router.patch("/followUnfollow",auth,FollowUnfollow);
 
 export default router;

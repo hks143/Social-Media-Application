@@ -14,7 +14,7 @@
 }
 
 .header{
-    background-color: #178140;
+    background-color: #4c71d8;
     height: 15%;
    display: flex;
    /* align-items: center;*/
@@ -85,7 +85,7 @@
 
 
 .sendBtn{
-    background-color: #178140; 
+    background-color: #2b4dac; 
     color: white; 
     border: none;
     width: 21%;
@@ -99,7 +99,7 @@
     transition: all 0.3s;
 }
 .sendBtn:hover{
-    background-color: rgb(28, 173, 83);
+    background-color: rgb(27, 46, 153);
 } 
 .sendBtn:hover img{
     transform: translateX(10px);

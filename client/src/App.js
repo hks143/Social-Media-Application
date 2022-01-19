@@ -11,6 +11,9 @@ import My404Component from './components/PageNotFound/PageNotFound.js'
 import LoginviaOTP from './components/Auth/LoginviaOTP';
 import Mychats from './components/mychats/Mychat';
 import Notification from './components/Notifications/Notification.js';
+import Profile from './components/Profile/Profile';
+import Follower from './components/Profile/Follower';
+import Following from './components/Profile/Following';
 const user = JSON.parse(localStorage.getItem('profile'));
 // console.log(user);
 const App = () => (
@@ -26,6 +29,10 @@ const App = () => (
                 <Route path="/notifications" exact component={Notification} />
                 <Route path="/direct" exact component={Mychats} />
                 <Route path="/:id" exact component={PostDetails} />
+                <Route path="/profile/:id" exact component={Profile} />
+                <Route path="/user/followers/:id" exact component={Follower} />
+                <Route path="/user/followings/:id" exact component={Following} />
+             
 
                 <Route path="/direct/:id">
                     { <Chat/>}
