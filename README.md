@@ -12,5 +12,5 @@ A Realtime social media application with users, posts, likes,comments and messag
 - Users can create a post and then edit or delete their post.
 - Users can like and comment.
 - Real-time chat is supported.
-- An attractive UI for better user experience.
+- An attractive UI for better user experience. 
 
